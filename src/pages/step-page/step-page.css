@@ -21,6 +21,9 @@
 }
 .prev {
   order: 0;
+  background-color: white;
+  color: #5558fa;
+  border: 1px solid #5558fa;
 }
 .next-first-step {
   margin-left: auto;
@@ -28,4 +31,10 @@
 
 .hidden {
   display: none;
+}
+.cheks {
+  margin-top: 30px;
+}
+.radio {
+  margin-top: 30px;
 }

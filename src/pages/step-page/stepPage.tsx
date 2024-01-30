@@ -1,12 +1,16 @@
 import { useState } from 'react';
-import { Stepper, Button, Group, TextInput, Code, Select } from '@mantine/core';
+import { Stepper, TextInput, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import './step-page.css';
 import Advantages from './addAdvantages';
-import CheckedItems from './CheckedItems';
+import { IndeterminateCheckbox } from './CheckboxItems';
+import { IndeterminateRadio } from './RadioItems';
+import { useNavigate } from '../../../node_modules/react-router-dom/dist/index';
+import { useSubmitFormMutation } from '../../store/api';
 
 const StepPage = () => {
   const [active, setActive] = useState(0);
+  const [submitForm, { isError, data }] = useSubmitFormMutation();
 
   const form = useForm({
     initialValues: {
@@ -29,7 +33,7 @@ const StepPage = () => {
               : null,
         };
       }
-      if (active === 2) {
+      if (active === 3) {
         return {
           about: values.about.trim().length < 1 ? 'Write something' : null,
         };
@@ -53,6 +57,27 @@ const StepPage = () => {
     });
 
   const prevStep = () => setActive((current) => (current > 0 ? current - 1 : current));
+  const navigate = useNavigate();
+
+  const handleStart = () => {
+    navigate('/');
+  };
+  const handleSubmit = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('nickname', form.values.nickname);
+      formData.append('name', form.values.name);
+      formData.append('surname', form.values.surname);
+      formData.append('about', form.values.about);
+
+      await submitForm(formData);
+
+      console.log('все збс');
+    } catch (error) {
+      console.error('Ошибка при выполнении запроса:', error);
+      console.log('все не збс');
+    }
+  };
 
   return (
     <div className="step-container">
@@ -92,7 +117,8 @@ const StepPage = () => {
 
         <Stepper.Step>
           <Advantages />
-          <CheckedItems />
+          <IndeterminateCheckbox />
+          <IndeterminateRadio />
         </Stepper.Step>
 
         <Stepper.Step>
@@ -103,8 +129,18 @@ const StepPage = () => {
             mt="100px"
           />
         </Stepper.Step>
-        <Stepper.Completed>Completed! Form values:</Stepper.Completed>
       </Stepper>
+
+      <div>
+        {active == 0 && (
+          <button
+            onClick={handleStart}
+            className={`btn-step ${active === 1 ? 'hidden' : 'prev'}`}
+          >
+            Назад
+          </button>
+        )}
+      </div>
 
       <div className="btn-step-group">
         {active !== 0 && (
@@ -115,12 +151,20 @@ const StepPage = () => {
             Назад
           </button>
         )}
-        {active !== 3 && (
+        {active !== 2 ? (
           <button
             onClick={nextStep}
             className={`btn-step ${active === 0 ? 'next-first-step' : ''}`}
           >
             Далее
+          </button>
+        ) : null}
+        {active === 2 && (
+          <button
+            onClick={handleSubmit}
+            className={`btn-step ${active === 0 ? 'next-first-step' : ''}`}
+          >
+            Отправить
           </button>
         )}
       </div>

@@ -2,6 +2,7 @@ import './style_intro.css';
 import folder_img from '../../../public/img/folder.svg';
 import { useForm } from '@mantine/form';
 import { NumberInput, TextInput, Button, Box } from '@mantine/core';
+import { useNavigate } from '../../../node_modules/react-router-dom/dist/index';
 
 const IntroPage = () => {
   const form = useForm({
@@ -9,10 +10,20 @@ const IntroPage = () => {
 
     validate: {
       phoneNumber: (value) =>
-        /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/.test(value) ? null : 'Invalid phone number',
+        !isNaN(value) && value !== '' ? null : 'Invalid phone number',
       email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
     },
   });
+  const navigate = useNavigate();
+
+  const handleStart = () => {
+    if (form.isValid()) {
+      navigate('/steps');
+    } else {
+      form.validate();
+    }
+  };
+
   return (
     <>
       <header className="header-intro">
@@ -43,7 +54,12 @@ const IntroPage = () => {
       </header>
       <main className="intro-form-container">
         <Box maw={340}>
-          <form onSubmit={form.onSubmit(console.log)}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleStart();
+            }}
+          >
             <NumberInput
               label="Номер телефона"
               placeholder="+7 (900) 000-00-00"
@@ -57,7 +73,9 @@ const IntroPage = () => {
               placeholder="Введите Email"
               {...form.getInputProps('email')}
             />
-            <button className="btn-start">Начать</button>
+            <button type="submit" className="btn-start">
+              Начать
+            </button>
           </form>
         </Box>
       </main>
